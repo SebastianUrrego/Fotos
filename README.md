@@ -1,6 +1,6 @@
 # 📸 Sistema Distribuido de Procesamiento de Imágenes (Fase 1)
 
-¡Hola! Bienvenido a la primera fase de nuestro procesador de imágenes. Básicamente, estamos construyendo el "motor" de una herramienta al estilo de Google Photos, usando computación paralela y distribuida para procesar imágenes súper rápido.
+Procesador de imágenes. Básicamente, estamos construyendo el "motor" de una herramienta al estilo de Google Photos, usando computación paralela y distribuida para procesar imágenes súper rápido.
 
 En esta etapa inicial logramos crear una prueba de concepto sólida: nuestro sistema ya puede dividir el trabajo pesado entre varios "servidores" virtuales y procesar fotos en paralelo.
 
@@ -48,5 +48,4 @@ Después de unos segunditos, verás que dentro de la carpeta `/outputs` (que se 
 Ya armamos todo el motor y los cimientos (la infraestructura y las matemáticas de OpenCV). Para que el resto del equipo pueda llevar esto al siguiente nivel, nos harían falta estas cositas:
 
 *   [ ] **Frontend (Interfaz Gráfica):** Una página web bonita (puede ser en React, Next.js o Vue) donde la gente pueda simplemente arrastrar sus fotos y ver los resultados sin tocar la consola ni saber qué es Docker.
-*   [ ] **Guardado en la Nube (Storage Escalable):** Dejar de usar carpetas locales (`inputs` / `outputs`) y conectar el sistema a una base de datos o un servicio en la nube (como Amazon S3 o Firebase) para manejar un volumen de datos real.
-*   [ ] **Más magia con Inteligencia Artificial:** Ya que tenemos OpenCV configurado, ¡el límite es nuestra imaginación! Podríamos agregar detección de objetos con YOLO, clasificación de imágenes, o filtros avanzados dinámicos para dárselos de comer a los trabajadores.
+*   [ ] **Guardado en la Nube (Storage Escalable):** Dejar de usar carpetas locales y cargar imagen desde el frontend
