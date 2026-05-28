@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  master:
+    build: .
+    container_name: mpi-master
+    volumes:
+      - .:/app
+    networks:
+      - mpi-net
+    command: tail -f /dev/null
+
+  worker1:
+    build: .
+    container_name: mpi-worker1
+    volumes:
+      - .:/app
+    networks:
+      - mpi-net
+    command: tail -f /dev/null
+
+  worker2:
+    build: .
+    container_name: mpi-worker2
+    volumes:
+      - .:/app
+    networks:
+      - mpi-net
+    command: tail -f /dev/null
+
+networks:
+  mpi-net:
