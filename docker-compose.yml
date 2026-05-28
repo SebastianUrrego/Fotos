@@ -6,9 +6,23 @@ services:
     container_name: mpi-master
     volumes:
       - .:/app
+    ports:
+      - "5000:5000"
     networks:
       - mpi-net
-    command: tail -f /dev/null
+    command: python /app/server.py
+
+  frontend:
+    image: node:20
+    container_name: mpi-frontend
+    working_dir: /app/frontend
+    volumes:
+      - .:/app
+    ports:
+      - "5173:5173"
+    networks:
+      - mpi-net
+    command: sh -c "npm install && npm run dev -- --host"
 
   worker1:
     build: .

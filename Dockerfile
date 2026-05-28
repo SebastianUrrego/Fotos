@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y \
     openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
+# Instalar dependencias de API (Flask)
+RUN pip3 install flask flask-cors
+
 # Configuración de SSH para permitir comunicación entre contenedores MPI
 RUN mkdir -p /var/run/sshd && \
     echo 'root:password' | chpasswd && \
