@@ -48,4 +48,4 @@ Después de unos segunditos, verás que dentro de la carpeta `/outputs` (que se 
 Ya armamos todo el motor y los cimientos (la infraestructura y las matemáticas de OpenCV). Para que el resto del equipo pueda llevar esto al siguiente nivel, nos harían falta estas cositas:
 
 *   [ ] **Frontend (Interfaz Gráfica):** Una página web bonita (puede ser en React, Next.js o Vue) donde la gente pueda simplemente arrastrar sus fotos y ver los resultados sin tocar la consola ni saber qué es Docker.
-*   [ ] **Guardado en la Nube (Storage Escalable):** Dejar de usar carpetas locales y cargar imagen desde el frontend
+*   [ ] **Guardado en el frontend:** Dejar de usar carpetas locales y cargar imagen desde el frontend
