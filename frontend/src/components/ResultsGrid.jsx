@@ -25,6 +25,27 @@ function ImageCard({ label, url, filename, sizeBytes, opKey, onExpand, delay }) 
   const [loaded, setLoaded] = useState(false);
   const [errored, setErrored] = useState(false);
 
+  const handleDownload = async (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename || `${label}-${opKey}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      console.error('Error al descargar:', err);
+      // Fallback
+      window.open(url, '_blank');
+    }
+  };
+
   return (
     <div
       className="glass-card flex flex-col overflow-hidden animate-fadeInScale"
@@ -93,10 +114,8 @@ function ImageCard({ label, url, filename, sizeBytes, opKey, onExpand, delay }) 
 
         {/* Download button */}
         {url && opKey !== 'original' && (
-          <a
-            href={url}
-            download={filename || `${opKey}.jpg`}
-            onClick={(e) => e.stopPropagation()}
+          <button
+            onClick={handleDownload}
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[8px] text-[10px] font-semibold transition-all duration-150 flex-shrink-0"
             style={{ background: 'rgba(0,0,0,0.30)', color: meta.color, border: `1px solid ${meta.border}` }}
             onMouseEnter={(e) => {
@@ -111,7 +130,7 @@ function ImageCard({ label, url, filename, sizeBytes, opKey, onExpand, delay }) 
           >
             <Download className="w-3 h-3" />
             <span>Descargar</span>
-          </a>
+          </button>
         )}
       </div>
     </div>
