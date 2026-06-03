@@ -1,9 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { Upload, Image as ImageIcon, X, AlertCircle, Plus } from 'lucide-react';
+import { Upload, X, AlertCircle, Plus, Image as ImageIcon, Grid3X3 } from 'lucide-react';
 
 export default function DragDrop({ files, setFiles }) {
   const [isDragActive, setIsDragActive] = useState(false);
   const [error, setError]               = useState('');
+  const [lightbox, setLightbox]         = useState(null);
   const fileInputRef = useRef(null);
 
   const handleDrag = (e) => {
@@ -15,19 +16,16 @@ export default function DragDrop({ files, setFiles }) {
   const validateAndAddFiles = (fileList) => {
     setError('');
     const valid = [], invalid = [];
-
     for (let i = 0; i < fileList.length; i++) {
       const file = fileList[i];
       const ext  = file.name.split('.').pop().toLowerCase();
       if (['jpg', 'jpeg', 'png'].includes(ext)) {
-        if (!files.some((f) => f.name === file.name)) {
+        if (!files.some((f) => f.name === file.name))
           valid.push({ file, name: file.name, size: file.size, preview: URL.createObjectURL(file) });
-        }
       } else {
         invalid.push(file.name);
       }
     }
-
     if (invalid.length > 0)
       setError(`Formato no soportado (solo JPG/PNG): ${invalid.slice(0, 3).join(', ')}`);
     if (valid.length > 0)
@@ -44,7 +42,8 @@ export default function DragDrop({ files, setFiles }) {
     if (e.target.files?.[0]) validateAndAddFiles(e.target.files);
   };
 
-  const removeFile = (idx) => {
+  const removeFile = (e, idx) => {
+    e.stopPropagation();
     setFiles((prev) => {
       URL.revokeObjectURL(prev[idx].preview);
       return prev.filter((_, i) => i !== idx);
@@ -65,7 +64,7 @@ export default function DragDrop({ files, setFiles }) {
   };
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-5">
 
       {/* ── Drop Zone ── */}
       <div
@@ -75,7 +74,7 @@ export default function DragDrop({ files, setFiles }) {
         onDragLeave={handleDrag}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current.click()}
-        className={`dropzone-base flex flex-col items-center justify-center p-14 text-center ${isDragActive ? 'dropzone-active' : ''}`}
+        className={`dropzone-base flex flex-col items-center justify-center p-12 text-center ${isDragActive ? 'dropzone-active' : ''}`}
       >
         <input
           ref={fileInputRef}
@@ -86,39 +85,38 @@ export default function DragDrop({ files, setFiles }) {
           onChange={handleFileInput}
         />
 
-        {/* Animated upload icon */}
+        {/* Upload icon */}
         <div className="mb-5 relative">
           <div
-            className="w-14 h-14 rounded-[16px] flex items-center justify-center"
+            className="w-16 h-16 rounded-[18px] flex items-center justify-center"
             style={{
               background: isDragActive
-                ? 'linear-gradient(135deg, rgba(99,102,241,0.25), rgba(168,85,247,0.25))'
-                : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${isDragActive ? 'rgba(168,85,247,0.4)' : 'rgba(255,255,255,0.07)'}`,
+                ? 'linear-gradient(135deg, rgba(0,212,255,0.25), rgba(20,202,186,0.25))'
+                : 'rgba(0,212,255,0.04)',
+              border: `1px solid ${isDragActive ? 'rgba(0,212,255,0.50)' : 'rgba(0,212,255,0.10)'}`,
               transition: 'all 0.25s ease',
-              boxShadow: isDragActive ? '0 0 24px rgba(139,92,246,0.2)' : 'none'
+              boxShadow: isDragActive ? '0 0 32px rgba(0,212,255,0.20)' : 'none'
             }}
           >
             <Upload
-              className={`w-6 h-6 transition-colors duration-200 ${isDragActive ? 'animate-float' : ''}`}
-              style={{ color: isDragActive ? '#a855f7' : 'var(--text-3)' }}
+              className={`w-7 h-7 transition-colors duration-200 ${isDragActive ? 'animate-float' : ''}`}
+              style={{ color: isDragActive ? '#00d4ff' : 'var(--text-3)' }}
             />
           </div>
-          {/* Corner plus badge */}
           <div
-            className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7)', boxShadow: '0 0 8px rgba(139,92,246,0.5)' }}
+            className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center"
+            style={{ background: 'linear-gradient(135deg, #00d4ff, #14caba)', boxShadow: '0 0 10px rgba(0,212,255,0.5)' }}
           >
-            <Plus className="w-3 h-3 text-white" strokeWidth={3} />
+            <Plus className="w-3.5 h-3.5 text-white" strokeWidth={3} />
           </div>
         </div>
 
-        <h3 className="text-[15px] font-semibold mb-1" style={{ color: isDragActive ? 'var(--text-1)' : 'var(--text-2)' }}>
+        <h3 className="text-[16px] font-semibold mb-1.5" style={{ color: isDragActive ? 'var(--text-1)' : 'var(--text-2)' }}>
           {isDragActive ? 'Suelta las imágenes aquí' : 'Arrastra o haz clic para subir'}
         </h3>
         <p className="text-[11px]" style={{ color: 'var(--text-3)' }}>
-          Soporta <span style={{ color: '#818cf8' }}>JPG</span> y <span style={{ color: '#818cf8' }}>PNG</span>
-          {' '}· Múltiples archivos
+          Soporta <span style={{ color: '#00d4ff' }}>JPG</span> y <span style={{ color: '#00d4ff' }}>PNG</span>
+          {' '}· Múltiples archivos permitidos
         </p>
       </div>
 
@@ -133,87 +131,150 @@ export default function DragDrop({ files, setFiles }) {
         </div>
       )}
 
-      {/* ── File List ── */}
+      {/* ── Image Gallery ── */}
       {files.length > 0 && (
-        <div className="space-y-3 animate-fadeInUp">
+        <div className="space-y-4 animate-fadeInUp">
+
+          {/* Gallery header */}
           <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-2">
-              <ImageIcon className="w-3.5 h-3.5" style={{ color: '#818cf8' }} />
+            <div className="flex items-center gap-2.5">
+              <Grid3X3 className="w-3.5 h-3.5" style={{ color: '#00d4ff' }} />
               <span className="text-[12px] font-semibold" style={{ color: 'var(--text-2)' }}>
-                {files.length} archivo{files.length !== 1 ? 's' : ''} listos
+                {files.length} imagen{files.length !== 1 ? 'es' : ''} seleccionada{files.length !== 1 ? 's' : ''}
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[9px] font-bold badge-blue">
+              <span
+                className="px-2 py-0.5 rounded-full text-[9px] font-bold badge-cyan"
+              >
                 {files.length}
               </span>
             </div>
-            <button
-              onClick={clearAll}
-              className="text-[11px] font-medium transition-colors"
-              style={{ color: 'var(--text-3)' }}
-              onMouseEnter={(e) => (e.target.style.color = '#f87171')}
-              onMouseLeave={(e) => (e.target.style.color = 'var(--text-3)')}
-            >
-              Limpiar todo
-            </button>
+            <div className="flex items-center gap-3">
+              {/* Add more */}
+              <button
+                onClick={(e) => { e.stopPropagation(); fileInputRef.current.click(); }}
+                className="text-[11px] font-medium flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] transition-all"
+                style={{
+                  color: '#00d4ff',
+                  background: 'rgba(0,212,255,0.06)',
+                  border: '1px solid rgba(0,212,255,0.15)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(0,212,255,0.12)';
+                  e.currentTarget.style.borderColor = 'rgba(0,212,255,0.30)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(0,212,255,0.06)';
+                  e.currentTarget.style.borderColor = 'rgba(0,212,255,0.15)';
+                }}
+              >
+                <Plus className="w-3 h-3" strokeWidth={2.5} />
+                Agregar más
+              </button>
+              <button
+                onClick={clearAll}
+                className="text-[11px] font-medium transition-colors"
+                style={{ color: 'var(--text-3)' }}
+                onMouseEnter={(e) => (e.target.style.color = '#f87171')}
+                onMouseLeave={(e) => (e.target.style.color = 'var(--text-3)')}
+              >
+                Limpiar todo
+              </button>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          {/* Gallery grid */}
+          <div className="gallery-grid">
             {files.map((item, index) => (
               <div
                 key={index}
-                className="group relative flex items-center gap-2.5 px-3 py-2 rounded-[12px] transition-all duration-150 animate-fadeInUp"
-                style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid var(--border)',
-                  animationDelay: `${index * 0.04}s`
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(139,92,246,0.25)';
-                  e.currentTarget.style.background = 'rgba(99,102,241,0.05)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--border)';
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
-                }}
+                className="gallery-thumb"
+                style={{ animationDelay: `${index * 0.05}s` }}
+                onClick={() => setLightbox(item)}
               >
-                {/* Thumbnail */}
-                <div className="w-9 h-9 rounded-[8px] overflow-hidden flex-shrink-0"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)' }}>
-                  <img
-                    src={item.preview}
-                    alt=""
-                    className="w-full h-full object-cover transition-opacity duration-150"
-                    style={{ opacity: 0.8 }}
-                    onMouseEnter={(e) => (e.target.style.opacity = '1')}
-                    onMouseLeave={(e) => (e.target.style.opacity = '0.8')}
-                  />
-                </div>
+                <img src={item.preview} alt={item.name} />
 
-                {/* Info */}
-                <div className="flex flex-col max-w-[100px]">
-                  <span className="text-[11px] font-medium truncate" style={{ color: 'var(--text-1)' }}>
-                    {item.name}
-                  </span>
-                  <span className="text-[9px]" style={{ color: 'var(--text-3)' }}>
-                    {formatBytes(item.size)}
-                  </span>
+                {/* Overlay gradient */}
+                <div className="gallery-thumb-overlay">
+                  <div style={{ width: '100%' }}>
+                    <p className="text-[9px] font-medium truncate" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                      {item.name.length > 14 ? item.name.substring(0, 12) + '…' : item.name}
+                    </p>
+                    <p className="text-[8px]" style={{ color: 'rgba(0,212,255,0.8)' }}>
+                      {formatBytes(item.size)}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Remove button */}
                 <button
-                  onClick={(e) => { e.stopPropagation(); removeFile(index); }}
-                  className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-150"
+                  className="gallery-thumb-remove"
+                  onClick={(e) => removeFile(e, index)}
+                  title="Eliminar"
+                >
+                  <X className="w-2.5 h-2.5" strokeWidth={2.5} />
+                </button>
+
+                {/* Index badge */}
+                <div
+                  className="absolute top-1.5 left-1.5 w-5 h-5 rounded-full flex items-center justify-center"
                   style={{
-                    background: '#1a1a2e',
-                    border: '1px solid rgba(239,68,68,0.30)',
-                    color: '#f87171',
-                    boxShadow: '0 0 8px rgba(239,68,68,0.2)'
+                    background: 'rgba(2,4,8,0.70)',
+                    border: '1px solid rgba(0,212,255,0.25)',
+                    fontSize: '8px',
+                    fontWeight: 700,
+                    color: '#00d4ff',
+                    fontFamily: "'JetBrains Mono', monospace"
                   }}
                 >
-                  <X className="w-3 h-3" strokeWidth={2.5} />
-                </button>
+                  {index + 1}
+                </div>
               </div>
             ))}
+
+            {/* Add more tile */}
+            <div
+              onClick={(e) => { e.stopPropagation(); fileInputRef.current.click(); }}
+              className="gallery-thumb flex flex-col items-center justify-center cursor-pointer"
+              style={{
+                border: '1.5px dashed rgba(0,212,255,0.15)',
+                background: 'rgba(0,212,255,0.02)',
+                minHeight: '80px'
+              }}
+            >
+              <Plus className="w-5 h-5 mb-1" style={{ color: 'var(--text-3)' }} />
+              <span className="text-[9px]" style={{ color: 'var(--text-3)' }}>Agregar</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Lightbox ── */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: 'rgba(0,2,6,0.92)', backdropFilter: 'blur(20px)' }}
+          onClick={() => setLightbox(null)}
+        >
+          <div
+            className="max-w-2xl w-full mx-4 animate-fadeInScale"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-3 px-1">
+              <div>
+                <h3 className="font-semibold text-[14px]" style={{ color: 'var(--text-1)' }}>{lightbox.name}</h3>
+                <p className="text-[11px]" style={{ color: '#00d4ff' }}>{formatBytes(lightbox.size)}</p>
+              </div>
+              <button
+                onClick={() => setLightbox(null)}
+                className="p-2 rounded-[10px] transition-colors"
+                style={{ background: 'rgba(239,68,68,0.08)', color: '#f87171', border: '1px solid rgba(239,68,68,0.20)' }}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="rounded-[16px] overflow-hidden" style={{ border: '1px solid rgba(0,212,255,0.15)', boxShadow: '0 0 60px rgba(0,212,255,0.10)' }}>
+              <img src={lightbox.preview} alt={lightbox.name} className="w-full h-auto block" />
+            </div>
           </div>
         </div>
       )}

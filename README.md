@@ -1,51 +1,69 @@
-# 📸 Sistema Distribuido de Procesamiento de Imágenes (Fase 1)
+# 📸 Sistema Distribuido de Procesamiento de Imágenes (Con Interfaz Web)
 
-Procesador de imágenes. Básicamente, estamos construyendo el "motor" de una herramienta al estilo de Google Photos, usando computación paralela y distribuida para procesar imágenes súper rápido.
+Bienvenido al procesador de imágenes. Este proyecto es una herramienta estilo plataforma web completa, diseñada usando computación **paralela y distribuida** para procesar imágenes extremadamente rápido aplicando múltiples filtros en tiempo real. 
 
-En esta etapa inicial logramos crear una prueba de concepto sólida: nuestro sistema ya puede dividir el trabajo pesado entre varios "servidores" virtuales y procesar fotos en paralelo.
+El sistema ya no se limita a comandos de consola; ahora cuenta con una arquitectura web completa, una API moderna en Flask y un panel de interfaz gráfica inmersiva desarrollada en React.
+
+---
 
 ## 🚀 ¿Qué hace y cómo funciona?
 
-Para que esto funcione rápido y no saturemos una sola máquina, armamos una arquitectura tipo **Maestro-Trabajador (Master-Worker)**. Se divide en dos conceptos clave:
+El sistema unifica tres componentes clave para lograr una experiencia escalable:
 
-*   **🌐 Computación Distribuida:** En vez de correr todo en un solo programa pesado, usamos Docker para simular múltiples computadoras conectadas en red (`mpi-master`, `mpi-worker1` y `mpi-worker2`). El "Maestro" toma las fotos, las vuelve archivos de datos (bytes) y se las manda a los "Trabajadores" a través de la red simulada usando **MPI (Message Passing Interface con OpenMPI)**.
-*   **⚡ Computación Paralela:** ¡Aquí es donde ocurre la magia! Mientras el Trabajador 1 usa su procesador para encontrar los bordes de una foto, al mismo exacto tiempo el Trabajador 2 está aplicándole un filtro de desenfoque a otra foto en la cola. Todo esto lo logramos utilizando las herramientas avanzadas de **OpenCV**.
+### 1. El Frontend (Página Web interactiva)
+Construido usando **React y Vite**, la aplicación provee un diseño de alta calidad (Dark Mode con detalles cyan). Las características principales son:
+* **Área Drag & Drop:** Los usuarios arrastran múltiples imágenes (.PNG o .JPG) directamente a la página.
+* **Galería interactiva pre-procesamiento:** Visualización de miniaturas simulando el escenario original.
+* **Galería Directa de Resultados (Modo Lightbox):** Tras mandarle la señal al clúster, el servidor recibe los nuevos resultados. La web muestra las imágenes en una nueva cuadrícula expandible automáticamente (Tarjeta de Original y sus 5 nuevos filtros calculados al mismo tiempo).
 
-## ⚙️ ¿Cómo probar el proyecto?
+### 2. El Backend Web (Python + Flask)
+Actúa como comunicador o puente entre la página web de los clientes y el poder de cálculo del clúster oculto (Docker). 
+El servidor está expuesto en un puerto seguro para que el Frontend mande sus fotos usando una API RESTful (`/api/upload`, `/api/process`, `/api/results`). Las fotos se depositan en el directorio interno del servidor y luego el Backend arranca un proceso en segundo plano de MPI.
 
-Hicimos que probar esto sea súper fácil, no tienes que meterte a tirar comandos raros si no quieres. 
+### 3. Computación Paralela y Distribuida (El Clúster MPI + Docker)
+Para lograr que la edición masiva no rompa el sistema y ocurra asíncronamente mientras el usuario espera, aplicamos 2 conceptos:
+* **🌐 Computación Distribuida (Master-Worker):** Usamos Docker Compose para crear físicamente varias máquinas aisladas en terminales distintas conectadas por su propia red interna (`mpi-master`, `mpi-worker1`, `mpi-worker2`). Utilizando la interfaz **OpenMPI**, el "Master" asimila las fotos locales en arrays numéricos de imagen reales y los manda por la red de Docker distribuyéndolos en partes equitativas a los Trabajadores.
+* **⚡ Computación Paralela (OpenCV Load Balancing):** En vez de asignar estáticamente tareas lentas, usamos un **Balanceo Dinámico De Cargas (Dynamic Load Balancing)**. Mientras un trabajador renderiza el "Filtro Sepia" a una foto, otro trabajador le está aplicando un desenfoque Gaussiano ("Blur"). Un proceso se libera e inmediatamente solicita otra parte de otra matriz asíncronamente reduciendo los cuellos de botella. 
 
-### Lo que necesitas tener instalado:
-* **Docker Desktop** (o Docker Engine) abierto.
+Toda la detección paralela y los cálculos lógicos se hacen con librerías matriciales embebidas en nivel bajo como OpenCV (procesando el `Sepia`, `Negativo`, `Desenfoque`, `Escala de Grises`, y `Bordes` ). 
 
-### La forma fácil (¡1 Click!):
-Simplemente abre tu consola en esta carpeta y ejecuta nuestro script automático:
-```cmd
-.\run.bat
-```
-*(¿Qué hace esto por debajo? Levanta los contenedores, dibuja una imagen de prueba por ti para que haya algo que procesar y le avisa a MPI que arranque el análisis entre todos los nodos).*
+---
 
-### La forma manual (Paso a paso para depurar):
-Si quieres ver exactamente qué está pasando por debajo, puedes abrir tu consola y usar estos comandos:
+## ⚙️ ¿Cómo levantar la Aplicación Web completa?
+
+Para probar el proyecto completo se necesitan 3 componentes levantados al tiempo.
+Asegúrate de contar con **Docker Desktop**, **Node.js** y **Python (con pip)** en tu computadora. Puedes ejecutar esto simultáneamente en distintas terminales.
+
+### Paso 1: Levantar los Nodos del Clúster (Docker)
+En la carpeta raíz del proyecto, enciende los tres trabajadores paralelos en segundo plano. Esto deja a nuestro clúster escuchando las peticiones:
 ```bash
-# 1. Por si acaso, limpiamos cualquier contenedor viejo que haya quedado:
-docker-compose down
-
-# 2. Encendemos nuestros nodos virtuales en segundo plano:
 docker-compose up --build -d
-
-# 3. Creamos la imagen de prueba para tener algo que procesar:
-docker exec -it mpi-master python /app/generate_sample.py
-
-# 4. ¡Soltamos a los trabajadores! Damos la orden a MPI para que orqueste todo:
-docker exec -it mpi-master mpiexec --allow-run-as-root -host mpi-master,mpi-worker1,mpi-worker2 -n 3 python /app/main.py
 ```
 
-Después de unos segunditos, verás que dentro de la carpeta `/outputs` (que se creará aquí mismo) aparecerán todas las imágenes ya procesadas por el clúster.
+### Paso 2: Encender el Servidor API de Flask (Backend)
+Debemos instalar los requisitos previos de Python (si no lo has hecho) y luego encender el servicio que orquestará los llamados hacia el Clúster. 
+Abre una consola en la raíz de tu proyecto `d:\Escritorio2\uni\paralela`:
+```bash
+# 1. Instala el módulo de Flask y utilidades web
+pip install flask flask-cors
 
-## 🔮 ¿Qué sigue para las próximas fases? (To-Do List)
+# 2. Corre el script (esto debe quedar abierto escuchando peticiones en el puerto 5000)
+python server.py
+```
 
-Ya armamos todo el motor y los cimientos (la infraestructura y las matemáticas de OpenCV). Para que el resto del equipo pueda llevar esto al siguiente nivel, nos harían falta estas cositas:
+### Paso 3: Lanzar la Página Web (Frontend React)
+Para ver la interfaz gráfica bonita y visualizar todo el proceso:
+Abre otra nueva consola en `d:\Escritorio2\uni\paralela\frontend`
+```bash
+# 1. Instalar las dependencias de componentes si es primera vez (Opcional si ya se hizo)
+npm install
 
-*   [ ] **Frontend (Interfaz Gráfica):** Una página web bonita (puede ser en React, Next.js o Vue) donde la gente pueda simplemente arrastrar sus fotos y ver los resultados sin tocar la consola ni saber qué es Docker.
-*   [ ] **Guardado en el frontend:** Dejar de usar carpetas locales y cargar imagen desde el frontend
+# 2. Iniciar el entorno en puerto 5173 o 5174
+npm run dev
+```
+
+🚀 Abre en tu navegador favorito el enlace que Vite te escupa (normalmente `http://localhost:5173/` o `http://localhost:5174/`).
+
+1. Arrastra unas cuantas fotos.
+2. Da clic en subir.
+3. Observa cómo el servidor Flask comanda al Clúster escondido (Docker), orquesta a cada Worker, procesa un total de 5 imágenes hijas por cada foto subida y te las retorna gráficamente hermosas y renderizadas en la interfaz final.

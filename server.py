@@ -118,7 +118,7 @@ def upload_images():
         "error": None,
         "start_time": 0,
         "duration": 0,
-        "total_tasks": len(saved_files) * 3, # 3 operations per image: grayscale, blur, edges
+        "total_tasks": len(saved_files) * 5, # 5 operations per image: grayscale, blur, edges, sepia, invert
         "completed_tasks": 0
     }
     
@@ -180,7 +180,7 @@ def get_results():
         operation = "unknown"
         original_name = filename
         
-        for op in ['grayscale', 'blur', 'edges']:
+        for op in ['grayscale', 'blur', 'edges', 'sepia', 'invert']:
             if filename.startswith(f"{op}_"):
                 operation = op
                 original_name = filename[len(op)+1:]

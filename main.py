@@ -29,6 +29,17 @@ def process_image(image, operation):
             # Detección de bordes usando el algoritmo Canny
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
             return cv2.Canny(gray, 100, 200)
+        elif operation == 'sepia':
+            import numpy as np
+            # Aplicar matriz de transformación sepia
+            kernel = np.array([[0.272, 0.534, 0.131],
+                               [0.349, 0.686, 0.168],
+                               [0.393, 0.769, 0.189]])
+            sepia_img = cv2.transform(image, kernel)
+            return np.clip(sepia_img, 0, 255).astype(np.uint8)
+        elif operation == 'invert':
+            # Invertir colores (negativo)
+            return cv2.bitwise_not(image)
     except Exception as e:
         print(f"[Worker {rank}] Error al procesar '{operation}': {e}")
     return image
@@ -53,7 +64,7 @@ def master_node():
         print("[Master] Error: Se requiere al menos 1 nodo Worker (Mínimo 2 procesos totales).")
         return
 
-    operations = ['grayscale', 'blur', 'edges']
+    operations = ['grayscale', 'blur', 'edges', 'sepia', 'invert']
     tasks = []
     
     # Construir lista de tareas: por cada imagen se van a hacer 3 procesamientos

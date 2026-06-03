@@ -31,6 +31,14 @@ export default function App() {
   const [logMessages, setLogMessages]   = useState([]);
   const [processingDone, setProcessingDone] = useState(false);
 
+  const clearResults = () => {
+    setOriginals([]);
+    setProcessed([]);
+    setProcessingDone(false);
+    setProcessingStatus({ status: 'idle', error: null, start_time: 0, duration: 0, total_tasks: 0, completed_tasks: 0 });
+    setLogMessages([]);
+  };
+
   /* ── ping backend ── */
   useEffect(() => {
     const pingServer = async () => {
@@ -128,10 +136,10 @@ export default function App() {
         {/* Brand */}
         <div className="flex items-center gap-3 px-1 mt-1 mb-1">
           <div className="relative w-10 h-10 rounded-[12px] flex items-center justify-center flex-shrink-0"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7)' }}>
+            style={{ background: 'linear-gradient(135deg, #00d4ff, #14caba)' }}>
             <Cpu className="w-5 h-5 text-white" />
             <div className="absolute inset-0 rounded-[12px] animate-pulse"
-              style={{ boxShadow: '0 0 18px rgba(99,102,241,0.5)', opacity: 0.7 }} />
+              style={{ boxShadow: '0 0 18px rgba(0,212,255,0.5)', opacity: 0.7 }} />
           </div>
           <div>
             <h1 className="text-[15px] font-bold" style={{ color: 'var(--text-1)', letterSpacing: '-0.02em' }}>
@@ -177,8 +185,8 @@ export default function App() {
         {/* Cluster Nodes */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2 px-1 mb-1">
-            <Server className="w-3.5 h-3.5" style={{ color: '#c084fc' }} />
-            <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#c084fc' }}>
+            <Server className="w-3.5 h-3.5" style={{ color: '#00d4ff' }} />
+            <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#00d4ff' }}>
               Nodos del Clúster
             </span>
           </div>
@@ -191,7 +199,7 @@ export default function App() {
                   <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isProcessing ? 'dot-run' : 'dot-idle'}`} />
                   <span className="text-[12px] font-mono font-medium" style={{ color: 'var(--text-2)' }}>{node}</span>
                 </div>
-                <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${isProcessing ? 'badge-purple' : 'badge-blue'}`}>
+                <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${isProcessing ? 'badge-teal' : 'badge-cyan'}`}>
                   {isProcessing ? 'RUN' : 'IDLE'}
                 </span>
               </div>
@@ -204,7 +212,7 @@ export default function App() {
           <div className="flex gap-2 flex-wrap">
             <div className="glass-card flex-1 p-3 flex flex-col items-center gap-0.5" style={{ minWidth: '60px' }}>
               <span className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--text-3)' }}>Total</span>
-              <span className="text-lg font-bold" style={{ color: '#818cf8' }}>{processingStatus.total_tasks}</span>
+              <span className="text-lg font-bold" style={{ color: '#00d4ff' }}>{processingStatus.total_tasks}</span>
             </div>
             <div className="glass-card flex-1 p-3 flex flex-col items-center gap-0.5" style={{ minWidth: '60px' }}>
               <span className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--text-3)' }}>Listos</span>
@@ -213,7 +221,7 @@ export default function App() {
             {processingStatus.duration > 0 && (
               <div className="glass-card flex-1 p-3 flex flex-col items-center gap-0.5" style={{ minWidth: '60px' }}>
                 <span className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--text-3)' }}>Tiempo</span>
-                <span className="text-lg font-bold" style={{ color: '#c084fc' }}>{processingStatus.duration.toFixed(1)}s</span>
+                <span className="text-lg font-bold" style={{ color: '#14caba' }}>{processingStatus.duration.toFixed(1)}s</span>
               </div>
             )}
           </div>
@@ -222,8 +230,8 @@ export default function App() {
         {/* Activity Log */}
         <div className="mt-auto">
           <div className="flex items-center gap-2 px-1 mb-2">
-            <Activity className="w-3.5 h-3.5" style={{ color: '#c084fc' }} />
-            <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#c084fc' }}>
+            <Activity className="w-3.5 h-3.5" style={{ color: '#00d4ff' }} />
+            <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#00d4ff' }}>
               Actividad
             </span>
           </div>
@@ -249,8 +257,8 @@ export default function App() {
           {/* Header */}
           <header className="space-y-3 animate-fadeInUp">
             <div className="flex items-center gap-2 mb-1">
-              <Zap className="w-4 h-4" style={{ color: '#818cf8' }} />
-              <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: '#818cf8' }}>
+              <Zap className="w-4 h-4" style={{ color: '#00d4ff' }} />
+              <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: '#00d4ff' }}>
                 Procesamiento Distribuido
               </span>
             </div>
@@ -282,24 +290,24 @@ export default function App() {
                     !serverOnline || isProcessing
                       ? { background: 'rgba(255,255,255,0.04)', color: 'var(--text-3)', cursor: 'not-allowed', border: '1px solid var(--border)' }
                       : {
-                          background: 'linear-gradient(135deg, #6366f1, #a855f7)',
-                          color: '#fff',
+                          background: 'linear-gradient(135deg, #00d4ff, #14caba)',
+                          color: '#021418',
                           border: 'none',
-                          boxShadow: '0 0 24px rgba(139,92,246,0.35), 0 4px 16px rgba(99,102,241,0.25)',
+                          boxShadow: '0 0 28px rgba(0,212,255,0.35), 0 4px 18px rgba(0,150,200,0.25)',
                           transform: 'translateY(0)',
                           cursor: 'pointer'
                         }
                   }
                   onMouseEnter={(e) => {
                     if (!isProcessing && serverOnline) {
-                      e.currentTarget.style.transform = 'translateY(-1px)';
-                      e.currentTarget.style.boxShadow = '0 0 32px rgba(139,92,246,0.5), 0 8px 24px rgba(99,102,241,0.3)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 0 40px rgba(0,212,255,0.55), 0 8px 28px rgba(0,150,200,0.35)';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!isProcessing && serverOnline) {
                       e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 0 24px rgba(139,92,246,0.35), 0 4px 16px rgba(99,102,241,0.25)';
+                      e.currentTarget.style.boxShadow = '0 0 28px rgba(0,212,255,0.35), 0 4px 18px rgba(0,150,200,0.25)';
                     }
                   }}
                 >
@@ -326,7 +334,7 @@ export default function App() {
                       <span className="text-[10px]" style={{ color: 'var(--text-3)' }}>
                         {processingStatus.completed_tasks} / {processingStatus.total_tasks} tareas
                       </span>
-                      <span className="text-[10px] font-bold" style={{ color: '#a855f7' }}>{progressPercent}%</span>
+                      <span className="text-[10px] font-bold" style={{ color: '#00d4ff' }}>{progressPercent}%</span>
                     </div>
                   </div>
                 )}
@@ -358,7 +366,7 @@ export default function App() {
           {originals.length > 0 && (
             <div className="animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
               <div style={{ height: '1px', background: 'var(--border)', marginBottom: '32px' }} />
-              <ResultsGrid originals={originals} processed={processed} />
+              <ResultsGrid originals={originals} processed={processed} onClear={clearResults} />
             </div>
           )}
 
