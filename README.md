@@ -67,3 +67,7 @@ npm run dev
 1. Arrastra unas cuantas fotos.
 2. Da clic en subir.
 3. Observa cómo el servidor Flask comanda al Clúster escondido (Docker), orquesta a cada Worker, procesa un total de 5 imágenes hijas por cada foto subida y te las retorna gráficamente hermosas y renderizadas en la interfaz final.
+
+
+<img width="1890" height="900" alt="image" src="https://github.com/user-attachments/assets/bf75cd90-63ae-4d45-a7ba-c42934abd7d6" />
+
